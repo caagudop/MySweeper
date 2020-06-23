@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import messagebox
 import random
 import os
-
+import time
 
 
 class Cell(Label):
@@ -14,6 +14,7 @@ class Cell(Label):
         self.mine_counter = 0
         self.is_flagged = 0
         self.swept = False
+        self.coordinates = 0
         self.configure(
              bg=self._color
             ,relief=GROOVE
@@ -50,7 +51,6 @@ class Cell(Label):
     def text(self, t):
         self._text.set(str(t))
     
-    
 
 
 class App(Tk):
@@ -64,46 +64,74 @@ class App(Tk):
         super().__init__(*args, **kwargs)
         self.title('BuscaMinas')
         self.geometry('{0}x{0}'.format(self.grid_dimentions*35))
-   
-         # initialize menu
-        def crearMenu(self):
-            menubar = Menu(self)
-            self.config(menu=menubar)
-            filemenu = Menu(menubar, tearoff=0)
-            filemenu.add_command(label="Dificultad")
-            filemenu.add_command(label="Abrir")
-            filemenu.add_command(label="Guardar")
-            filemenu.add_command(label="Cerrar")
-            filemenu.add_separator()
-            filemenu.add_command(label="Salir", command=self.quit)
-            menubar.add_cascade(label="Archivo", menu=filemenu)
-            
-        # initialize cell grid
-        def crearFrame(self):
-            self.bomb_area=None
-            self.bomb_area = Frame(self)
-            self.cells = []
-            self.cells_discovered = 0
-            self.mines_flagged = 0
-            for row in range(self.grid_dimentions):
-                self.cells.append(list())
-                Grid.rowconfigure(self.bomb_area, row, weight=1)
-                for column in range(self.grid_dimentions):
-                    Grid.columnconfigure(self.bomb_area, column, weight=1)
-                    cell = self.make_cell()
-                    cell.grid(row=row, column=column, sticky='NEWS')
-                    self.cells[-1].append(cell)
+        self.dificultad = "Facil"
+        self.numBoombs=5
+        self.plantedBoombs=0
+        self.crearFrame()
         
-        # configure squares adjacent to mines with adjacent mine count
-            for r in range(self.grid_dimentions):
-                for c in range(self.grid_dimentions):
-                    if self.cells[r][c].is_explosive:
-                        for cell in self.get_adjacent_cells(self.cells[r][c]):
-                            cell.mine_counter += 1
-            self.bomb_area.pack(expand=True, fill=BOTH)
+  
 
-        crearMenu(self)
-        crearFrame(self)
+    def crearMenu(self):
+        menubar = Menu(self)
+        self.config(menu=menubar)
+        filemenu = Menu(menubar, tearoff=0)
+        filemenu.add_command(label="Muy Facil", command=self.mfacil)
+        filemenu.add_command(label="Facil", command=self.facil)
+        filemenu.add_command(label="Medio", command=self.medio)
+        filemenu.add_command(label="Dificil", command=self.dificil)
+        filemenu.add_command(label="Extremo", command=self.extreme)
+        menubar.add_cascade(label="Dificultad", menu=filemenu)
+        menubar.add_command(label="Reset", command=self.reset)
+        menubar.add_command(label="facil", command=self.reset)
+       
+    def mfacil(self):
+        self.dificultad=0
+        self.numBoombs=1
+        self.reset()
+    def facil(self):
+        self.dificultad=1
+        self.numBoombs=5
+        self.reset()
+    def medio(self):
+        self.dificultad=2
+        self.numBoombs=10
+        self.reset()
+    def dificil(self):
+        self.dificultad=3
+        self.numBoombs=25
+        self.reset()
+    def extreme(self):
+        self.dificultad=4
+        self.numBoombs=50
+        self.reset()
+           
+   
+    def crearFrame(self, dificultad=1):
+        self.crearMenu()   
+        self.bomb_area = Frame(self)
+        self.cells = []
+        self.cells_discovered = 0
+        self.mines_flagged = 0
+        cont=0
+        for row in range(self.grid_dimentions):
+            self.cells.append(list())
+            Grid.rowconfigure(self.bomb_area, row, weight=1)
+            for column in range(self.grid_dimentions):
+                Grid.columnconfigure(self.bomb_area, column, weight=1)
+                cell = self.make_cell()
+                cell.coordinates=cont
+                cell.grid(row=row, column=column, sticky='NEWS')
+                self.cells[-1].append(cell)
+                cont= cont +1
+        #self.rellenarBombas()
+    # configure squares adjacent to mines with adjacent mine count
+        for r in range(self.grid_dimentions):
+            for c in range(self.grid_dimentions):
+                if self.cells[r][c].is_explosive:
+                    for cell in self.get_adjacent_cells(self.cells[r][c]):
+                        cell.mine_counter += 1
+        self.bomb_area.pack(expand=True, fill=BOTH)
+
   
         
     
@@ -127,8 +155,7 @@ class App(Tk):
             for c in range(self.grid_dimentions):
                 if self.cells[r][c] is cell:
                     return r,c
-    
-    
+   
     def sweep(self, cell):
         if cell.swept:
             return
@@ -152,9 +179,26 @@ class App(Tk):
                 if cell.is_explosive and not cell.is_flagged:
                     cell.color = 'red'
         resul = messagebox.askquestion('Has perdido', '¿Volver a intentarlo?.')
-        if resul == "si":
-            reset()
+        if resul == "yes":
+            self.reset()
+        elif resul == "no":
+            self.salir()
 
+    def reset(self, d=1):
+        for widget in self.bomb_area.winfo_children():
+            widget.destroy()
+        self.bomb_area.pack_forget()
+        self.plantedBoombs = 0
+        self.crearFrame(dificultad=d)
+
+    def salir(self):
+        resul = messagebox.askquestion('Por favor juega conmigo','¿Estas seguro?')
+        if resul == "yes":
+            self.quit()
+            self.destroy()
+        elif resul == "no":
+            self.reset()
+          
     def toggle_flag(self, cell):
         cell.is_flagged ^= 1
         if cell.is_flagged:
@@ -171,14 +215,42 @@ class App(Tk):
                 self.mines_flagged -= 1
         self.check_victory()
     
-    
+    #def rellenarBombas(self):
+    #    lista=[]
+    #    for i in range(self.numBoombs):
+    #        rand = random.randint(0,64)
+    #        if rand not in lista:
+    #            lista.append(rand)
+    #        else:
+    #            rand = random.randint(0,64)
+    #            if rand not in lista:
+    #                lista.append(rand)
+
+    #    cont=0
+    #    for r in range(self.grid_dimentions):
+    #        for c in range(self.grid_dimentions):
+    #            cell = self.cells[r][c]
+    #            if cell.coordinates in lista:
+    #                cell.is_explosive = True
+    #                cell.bind('<Button-1>', lambda cb: self.explode_mine(cell))
+    #                cont=cont+1
+    #            else:
+    #                cell.bind('<Button-1>', lambda cb: self.sweep(cell))
+    #            cell.bind('<Button-3>', lambda cb: self.toggle_flag(cell))
+    #            cont=cont+1
+
     def make_cell(self):
         c = Cell(self.bomb_area)
-        
+        if self.numBoombs == 1:
+            num=100
+        else:
+            num = int(50/self.numBoombs)
+        print(num)
         # TODO: implement a better algorithm for distributing mines
         if random.randint(0,4) == 0:
-            c.is_explosive = True
-        
+            #if self.plantedBoombs <= :
+                c.is_explosive = True
+                #self.plantedBoombs = self.plantedBoombs+1
         if c.is_explosive:
             c.bind('<Button-1>', lambda cb: self.explode_mine(c))
         else:
@@ -186,13 +258,14 @@ class App(Tk):
         c.bind('<Button-3>', lambda cb: self.toggle_flag(c))
         return c
         
-        
+
+
     def check_victory(self):
         print (self.mines_flagged, self.cells_discovered)
         if self.mines_flagged + self.cells_discovered == self.grid_dimentions**2:
             messagebox.showinfo('YOU WIN!!', "you didn't explode this time!!")
 
-    def reset():
+    
         
 
 
