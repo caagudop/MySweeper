@@ -14,7 +14,6 @@ class Cell(Label):
         self.mine_counter = 0
         self.is_flagged = 0
         self.swept = False
-        self.coordinates = 0
         self.configure(
              bg=self._color
             ,relief=GROOVE
@@ -51,27 +50,38 @@ class Cell(Label):
     def text(self, t):
         self._text.set(str(t))
     
-
+def getRandomSeed(num):
+    lista=[]
+    while len(lista)<=num:
+        rand = random.randint(0,77)
+        if rand not in lista:
+            lista.append(rand)
+    return lista
 
 class App(Tk):
+    
     def __init__(self, *args, **kwargs):
-
         try:
             self.grid_dimentions = kwargs.pop('dimentions')
         except KeyError:
             self.grid_dimentions = 8
-        
         super().__init__(*args, **kwargs)
         self.title('BuscaMinas')
         self.geometry('{0}x{0}'.format(self.grid_dimentions*35))
-        self.dificultad = "Facil"
+        self.dificultad = 1
         self.numBoombs=5
-        self.plantedBoombs=0
+        self.plantedBoombs =getRandomSeed(5)
         self.crearFrame()
-        
-  
+        self.footer = Button(self, text="Reset",command=self.reset)
+        self.footer.pack(after=self.bomb_area, side=BOTTOM)  
+
+    def  Draw(self):
+        global text
+        text=Label(self,text='Tiempo')
+        text.pack(after=self.bomb_area, side=BOTTOM) 
 
     def crearMenu(self):
+        global dific
         menubar = Menu(self)
         self.config(menu=menubar)
         filemenu = Menu(menubar, tearoff=0)
@@ -81,48 +91,60 @@ class App(Tk):
         filemenu.add_command(label="Dificil", command=self.dificil)
         filemenu.add_command(label="Extremo", command=self.extreme)
         menubar.add_cascade(label="Dificultad", menu=filemenu)
-        menubar.add_command(label="Reset", command=self.reset)
-        menubar.add_command(label="facil", command=self.reset)
-       
+        dific=Label(self,text='')
+        dific.pack() 
+        
+  
     def mfacil(self):
         self.dificultad=0
         self.numBoombs=1
+        self.plantedBoombs = getRandomSeed(1)
         self.reset()
     def facil(self):
         self.dificultad=1
         self.numBoombs=5
+        self.plantedBoombs = getRandomSeed(5)
         self.reset()
     def medio(self):
         self.dificultad=2
         self.numBoombs=10
+        self.plantedBoombs = getRandomSeed(10)
         self.reset()
     def dificil(self):
         self.dificultad=3
         self.numBoombs=25
+        self.plantedBoombs = getRandomSeed(25)
         self.reset()
     def extreme(self):
         self.dificultad=4
         self.numBoombs=50
+        self.plantedBoombs = getRandomSeed(50)
         self.reset()
            
    
     def crearFrame(self, dificultad=1):
         self.crearMenu()   
+        global timer
+        global dific
+        dificD=["Muy Facil","Facil","Medio","Dificil","Extremo"]
+        dific.configure(text="Dificultad: " + dificD[self.dificultad])
+        timer = time.time()
         self.bomb_area = Frame(self)
         self.cells = []
         self.cells_discovered = 0
         self.mines_flagged = 0
-        cont=0
+        cont = 0
+
         for row in range(self.grid_dimentions):
             self.cells.append(list())
             Grid.rowconfigure(self.bomb_area, row, weight=1)
             for column in range(self.grid_dimentions):
+                cont = cont +1
                 Grid.columnconfigure(self.bomb_area, column, weight=1)
-                cell = self.make_cell()
-                cell.coordinates=cont
+                cell = self.make_cell(column, row)
                 cell.grid(row=row, column=column, sticky='NEWS')
                 self.cells[-1].append(cell)
-                cont= cont +1
+        print(str(cont) + "---")
         #self.rellenarBombas()
     # configure squares adjacent to mines with adjacent mine count
         for r in range(self.grid_dimentions):
@@ -130,11 +152,11 @@ class App(Tk):
                 if self.cells[r][c].is_explosive:
                     for cell in self.get_adjacent_cells(self.cells[r][c]):
                         cell.mine_counter += 1
+
         self.bomb_area.pack(expand=True, fill=BOTH)
 
+   
   
-        
-    
     def get_adjacent_cells(self, cell):
         # get all cells in cell grid, ignoring all edge cases pun intended
         r,c = self.locate_cell(cell)
@@ -188,7 +210,7 @@ class App(Tk):
         for widget in self.bomb_area.winfo_children():
             widget.destroy()
         self.bomb_area.pack_forget()
-        self.plantedBoombs = 0
+        self.plantedBoombs =getRandomSeed(self.numBoombs)
         self.crearFrame(dificultad=d)
 
     def salir(self):
@@ -239,18 +261,13 @@ class App(Tk):
     #            cell.bind('<Button-3>', lambda cb: self.toggle_flag(cell))
     #            cont=cont+1
 
-    def make_cell(self):
+    def make_cell(self, x, y):
         c = Cell(self.bomb_area)
-        if self.numBoombs == 1:
-            num=100
-        else:
-            num = int(50/self.numBoombs)
-        print(num)
+        num = x*10+y
         # TODO: implement a better algorithm for distributing mines
-        if random.randint(0,4) == 0:
-            #if self.plantedBoombs <= :
-                c.is_explosive = True
-                #self.plantedBoombs = self.plantedBoombs+1
+
+        if num in self.plantedBoombs:
+            c.is_explosive = True
         if c.is_explosive:
             c.bind('<Button-1>', lambda cb: self.explode_mine(c))
         else:
@@ -266,11 +283,21 @@ class App(Tk):
             messagebox.showinfo('YOU WIN!!', "you didn't explode this time!!")
 
     
-        
+    def Refresher(self):
+        global text
+        global timer
+        end = time.time()
+        minutes, seconds = divmod(end-timer, 60)
+        seconds = str(int(seconds)).zfill(2)
+        tt = "Tiempo: "+"{:0>2}:{}".format(int(minutes),seconds)
+        text.configure(text=tt)
+        self.after(1000, self.Refresher) # every second...
 
 
 def inicio():
     app = App()
+    app.Draw()
+    app.Refresher()
     app.mainloop()
 
 
