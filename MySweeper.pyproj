@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>719aae58-7f97-4b91-92f2-3cc2215c164b</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>MySweeper.py</StartupFile>
+    <StartupFile>Game.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -22,7 +22,13 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="MySweeper.py" />
+    <Compile Include="Aplication.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Cell.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Game.py" />
   </ItemGroup>
   <ItemGroup>
     <Interpreter Include="env\">
@@ -37,6 +43,23 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="requirements.txt" />
+    <Content Include="Resources\background1.PNG" />
+    <Content Include="Resources\background3.PNG" />
+    <Resource Include="Resources\count.png" />
+    <Resource Include="Resources\count1.png" />
+    <Resource Include="Resources\count2.png" />
+    <Resource Include="Resources\count3.png" />
+    <Resource Include="Resources\count4.png" />
+    <Resource Include="Resources\count5.png" />
+    <Resource Include="Resources\count6.png" />
+    <Resource Include="Resources\count7.png" />
+    <Resource Include="Resources\count8.png" />
+    <Resource Include="Resources\minesweeperflag.png" />
+    <Resource Include="Resources\background2.png" />
+    <Resource Include="Resources\background.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
