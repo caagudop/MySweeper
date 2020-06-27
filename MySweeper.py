@@ -67,18 +67,22 @@ class App(Tk):
             self.grid_dimentions = 8
         super().__init__(*args, **kwargs)
         self.title('BuscaMinas')
-        self.geometry('{0}x{0}'.format(self.grid_dimentions*35))
+        self.geometry('{0}x{0}'.format(self.grid_dimentions*50))
         self.dificultad = 1
         self.numBoombs=5
         self.plantedBoombs =getRandomSeed(5)
+        self.dificL=Label(self,text='', bg='#666666', fg='white')
+        self.dificL.pack(side=TOP, fill=X) 
         self.crearFrame()
-        self.footer = Button(self, text="Reset",command=self.reset)
-        self.footer.pack(after=self.bomb_area, side=BOTTOM)  
+        self.footer = Button(self, text="Reset",command=self.reset, bd=5, relief=RIDGE)
+        self.footer.pack(after=self.bomb_area, side=BOTTOM) 
+    
+
 
     def  Draw(self):
         global text
-        text=Label(self,text='Tiempo')
-        text.pack(after=self.bomb_area, side=BOTTOM) 
+        text=Label(self,text='Tiempo', bg='#666666', fg='white')
+        text.pack(after=self.bomb_area, side=BOTTOM, fill=X) 
 
     def crearMenu(self):
         global dific
@@ -91,8 +95,8 @@ class App(Tk):
         filemenu.add_command(label="Dificil", command=self.dificil)
         filemenu.add_command(label="Extremo", command=self.extreme)
         menubar.add_cascade(label="Dificultad", menu=filemenu)
-        dific=Label(self,text='')
-        dific.pack() 
+        dificD=["Muy Facil","Facil","Medio","Dificil","Extremo"]
+        self.dificL.configure(text="Dificultad: " + dificD[self.dificultad])
         
   
     def mfacil(self):
@@ -124,10 +128,7 @@ class App(Tk):
    
     def crearFrame(self, dificultad=1):
         self.crearMenu()   
-        global timer
-        global dific
-        dificD=["Muy Facil","Facil","Medio","Dificil","Extremo"]
-        dific.configure(text="Dificultad: " + dificD[self.dificultad])
+        global timer    
         timer = time.time()
         self.bomb_area = Frame(self)
         self.cells = []
@@ -296,6 +297,7 @@ class App(Tk):
 
 def inicio():
     app = App()
+    app['background']='#666666'
     app.Draw()
     app.Refresher()
     app.mainloop()
