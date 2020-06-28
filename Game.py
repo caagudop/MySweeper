@@ -1,5 +1,6 @@
 from Aplication import *
-
+from tkinter import *
+from tkinter import font
 #------------------------------------------------------
 #Inicio Aplicacion
 #------------------------------------------------------

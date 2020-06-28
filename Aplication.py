@@ -21,8 +21,24 @@ def getRandomSeed(num):
 bcolor="#c9c9c9"
 tcolor="#000000"
 
+def nwindow():
+    nwin = Toplevel()
+    nwin.title("New Window")
+    imgt=Image.open("Resources/minesweeperflag.png")
+    imgt = imgt.resize((40, 40), Image.ANTIALIAS)
+    photo2= ImageTk.PhotoImage(imgt)
+    lbl2 = Label(nwin, image = photo2)
+    lbl2.pack()
+    #b= Button(nwin,text="Reset",command=nwin.destroy(), bd=3, relief=RIDGE, bg='#6DB6FF')
+    #b.pack(side=BOTTOM) 
+    nwin.mainloop()
+
+
 class App(Tk):
-    
+   
+ 
+  
+
   #------------------------------------------------------
   # Constructor
   #------------------------------------------------------
@@ -52,7 +68,36 @@ class App(Tk):
   #------------------------------------------------------      
   #Metodos inicio
   #------------------------------------------------------
-
+    def nwindow(self, bwin=False):
+        self.withdraw()
+        nwin = Toplevel()
+        nwin.geometry('{0}x{0}'.format(self.grid_dimentions*40))
+        global timer
+        end = time.time()
+        minutes, seconds = divmod(end-timer, 60)
+        seconds = str(int(seconds)).zfill(2)
+        tt = "Tiempo: "+"{:0>2}:{}".format(int(minutes),seconds)
+        tile="Oh vaya!!!!"
+        ruta="Resources/minesweeperflag.png"
+        texto="¡Has perdido!"
+        if bwin:
+            tile="Enhorabuena!!!!"
+            ruta="Resources/minesweeperflag.png"
+            texto="¡Has ganado!"
+        nwin.title(tile)
+        imgt=Image.open(ruta)
+        imgt = imgt.resize((100, 100), Image.ANTIALIAS)
+        photo2= ImageTk.PhotoImage(imgt)
+        lbl2 = Label(nwin, image = photo2)
+        lbl2.pack()
+        aa = Label(nwin,text =texto,width=1000, font = "Courier 20")
+        aa.pack()
+        ab = Label(nwin,text =tt,width=1000, font = "Courier 14")
+        ab.pack()
+        b= Button(nwin,text="OK",command= lambda: (nwin.destroy(), self.deiconify(), self.reset()), bd=3, relief=RIDGE, bg='#6DB6FF')
+        b.pack() 
+        nwin.mainloop()
+           
     def menuCreate(self):
         global dific
         menubar = Menu(self)
@@ -206,11 +251,12 @@ class App(Tk):
                     imgt = imgt.resize((40, 40), Image.ANTIALIAS)
                     cell.image=ImageTk.PhotoImage(imgt)
                     cell.color = 'red'
-        resul = messagebox.askquestion('Has perdido', '¿Volver a intentarlo?.')
-        if resul == "yes":
-            self.reset()
-        elif resul == "no":
-            self.exitGame()
+        self.nwindow(False)    
+        #resul = messagebox.askquestion('Has perdido', '¿Volver a intentarlo?.')
+        #if resul == "yes":
+        #    self.reset()
+        #elif resul == "no":
+        #    self.exitGame()
 
   #------------------------------------------------------
 
@@ -267,16 +313,13 @@ class App(Tk):
         if resul == "yes":
             self.quit()
             self.destroy()
-        elif resul == "no":
-            self.withdraw()
-            e = NewWindow(self)
-            self.deiconify()
-            #self.reset()
+        elif resul == "no":            
+            self.reset()
           
     def check_victory(self):
         print (self.mines_flagged, self.cells_discovered)
         if self.mines_flagged + self.cells_discovered == self.grid_dimentions**2:
-            messagebox.showinfo('YOU WIN!!', "you didn't explode this time!!")
+            self.nwindow(True)    
 
   #------------------------------------------------------
   #Timer
@@ -292,7 +335,7 @@ class App(Tk):
         text.configure(text=tt)
         self.after(1000, self.Refresher) # every second...
 
-    def  Draw(self):
+    def Draw(self):
         global text
         global bcolor
         global tcolor
