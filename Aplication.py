@@ -19,7 +19,7 @@ def getRandomSeed(num):
     return lista
 
 bcolor="#c9c9c9"
-tcolor="#666666"
+tcolor="#000000"
 
 class App(Tk):
     
@@ -43,7 +43,10 @@ class App(Tk):
         self.dificL=Label(self,text='', bg=bcolor, fg=tcolor)
         self.dificL.pack(side=TOP, fill=X) 
         self.frameCreate()
-        self.footer = Button(self, text="Reset",command=self.reset, bd=5, relief=RIDGE, bg='#ffd2e8')
+         #imgt=Image.open("Resources/minesweeperflag.png")
+         #   imgt = imgt.resize((40, 40), Image.ANTIALIAS)
+         #   cell.image = ImageTk.PhotoImage(imgt)
+        self.footer = Button(self, text="Reset",command=self.reset, bd=3, relief=RIDGE, bg='#6DB6FF')
         self.footer.pack(after=self.bomb_area, side=BOTTOM) 
   
   #------------------------------------------------------      
@@ -199,6 +202,9 @@ class App(Tk):
         for row in self.cells:
             for cell in row:
                 if cell.is_explosive:
+                    imgt=Image.open("Resources/bomb.png")
+                    imgt = imgt.resize((40, 40), Image.ANTIALIAS)
+                    cell.image=ImageTk.PhotoImage(imgt)
                     cell.color = 'red'
         resul = messagebox.askquestion('Has perdido', '¿Volver a intentarlo?.')
         if resul == "yes":
@@ -223,14 +229,8 @@ class App(Tk):
             if cell.color == 'blue':
                 cell.text=''
                 auxk = cell.mine_counter 
-                if auxk>0 or auxk is not None:
-                  try:
-                    rutad = "Resources/count"+str(auxk)+".png"
-                    imgt=Image.open(rutad)
-                  except:
-                    rutad = "Resources/count.png"
-                    imgt=Image.open(rutad)
-                imgt = imgt.resize((40, 40), Image.ANTIALIAS)
+                rutad = "Resources/background1.png"
+                imgt=Image.open(rutad)
                 cell.image=ImageTk.PhotoImage(imgt)
                 cell.color = 'white'
                 cell.hide_text()
@@ -268,7 +268,10 @@ class App(Tk):
             self.quit()
             self.destroy()
         elif resul == "no":
-            self.reset()
+            self.withdraw()
+            e = NewWindow(self)
+            self.deiconify()
+            #self.reset()
           
     def check_victory(self):
         print (self.mines_flagged, self.cells_discovered)
@@ -298,3 +301,14 @@ class App(Tk):
 
    #------------------------------------------------------
 
+     
+class NewWindow(Toplevel): 
+      
+    def __init__(self, master = None): 
+          
+        super().__init__(master = master) 
+        self.title("New Window") 
+        self.geometry("200x200") 
+        label = Label(self, text ="This is a new Window") 
+        label.pack() 
+  

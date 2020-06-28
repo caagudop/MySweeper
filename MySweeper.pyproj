@@ -29,6 +29,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Game.py" />
+    <Compile Include="newWindow.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Interpreter Include="env\">
@@ -43,8 +46,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="requirements.txt" />
-    <Content Include="Resources\background1.PNG" />
+    <Resource Include="Resources\firework.gif" />
+    <Resource Include="Resources\reset.png" />
+    <Resource Include="Resources\background1.png" />
     <Content Include="Resources\background3.PNG" />
+    <Resource Include="Resources\bomb.png" />
     <Resource Include="Resources\count.png" />
     <Resource Include="Resources\count1.png" />
     <Resource Include="Resources\count2.png" />
