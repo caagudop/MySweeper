@@ -43,6 +43,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="requirements.txt" />
+    <Resource Include="Resources\leader.png" />
+    <Resource Include="Resources\decepcion.png" />
+    <Resource Include="Resources\firecracker.png" />
     <Resource Include="Resources\firework.gif" />
     <Resource Include="Resources\reset.png" />
     <Resource Include="Resources\background1.png" />
