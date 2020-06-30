@@ -41,13 +41,16 @@ class App(Tk):
         self.resizable(False, False)
         self.plantedBoombs =getRandomSeed(5)
         dicrWin={
-         "muy facil":{1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0},
-         "facil":{1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0},
-         "medio":{1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0},
-         "dificil":{1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0},
-         "extreme":{1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0}
+         "muy facil":[],
+         "facil":[],
+         "medio":[],
+         "dificil":[],
+         "extreme":[]
          }  
         self.dicrW=dicrWin
+        self.inicio=0
+        self.tiempo=0
+        self.crono=True
         global bcolor
         global tbcolor
         self.dificL=Label(self,text='', bg=bcolor, fg=tcolor)
@@ -59,118 +62,21 @@ class App(Tk):
         self.footer = Button(self, text="Reset",command=self.reset, bd=3, relief=RIDGE, bg='#6DB6FF')
         self.footer.pack(after=self.bomb_area, side=BOTTOM) 
   
-    #def askClose(self, nwin):
-    #    resul = messagebox.askquestion('Espera un momento', '¿Quieres olver a intentarlo?.')
-    #    if resul == "yes":
-    #        self.reset()
-    #    elif resul == "no":
-    #        self.exitGame()
 
-  #------------------------------------------------------      
-  #Ventana Win Loose
-  #------------------------------------------------------
-    def winwin(self, bmos=False, time=time):
+    def updateDictW(self, time=0, bmos=False):
         if bmos:
-            self.nwindowB(binlcuir=True, time=time)
-        else:
-            pass
-    def nwindow(self, bwin=False):
-        self.grab_set()
-        nwin = Toplevel()
-        nwin.geometry('250x200')
-        nwin.protocol("WM_DELETE_WINDOW", lambda: (nwin.destroy(), self.grab_release(), self.reset()))
-        nwin.resizable(False, False)
-        global timer
-        end = time.time()
-        print(end)
-        minutes, seconds = divmod(end-timer, 60)
-        seconds = str(int(seconds)).zfill(2)
-        tt = "Tiempo: "+"{:0>2}:{}".format(int(minutes),seconds)
-        tile="Oh vaya!!!!"
-        ruta="Resources/decepcion.png"
-        texto="¡Has perdido!"
-        if bwin:
-            tile="Enhorabuena!!!!"
-            ruta="Resources/firecracker.png"
-            texto="¡Has ganado!"
-        nwin.title(tile)
-        imgt=Image.open(ruta)
-        imgt = imgt.resize((100, 100), Image.ANTIALIAS)
-        photo2= ImageTk.PhotoImage(imgt)
-        lbl2 = Label(nwin, image = photo2)
-        lbl2.pack()
-        aa = Label(nwin,text =texto,width=1000, font = "Courier 20")
-        aa.pack()
-        ab = Label(nwin,text =tt,width=1000, font = "Courier 14")
-        ab.pack()
-        b= Button(nwin,text="OK",command= lambda : (nwin.destroy(), self.grab_release(), self.reset(), self.winwin(bmos=bwin, time=end) ), bd=3, relief=RIDGE, bg='#6DB6FF')
-        b.pack() 
-        nwin.mainloop()  
-        
-  #------------------------------------------------------      
-  #Ventana ScoreBoard
-  #------------------------------------------------------
-    
-    def updateDictW(self, time=0):
          dificD=["muy facil","facil","medio","dificil","extreme"]       
-         dicc=self.dicrW[dificD[self.dificultad]]
-         global timer
-         auxv=timer-time+1
-         print(timer)
-         for key, value in dicc.items(): 
-            print(value)
-            if value<=auxv:
-                ff=value
-                dicc[key]=auxv
-                for i in range(key+1,len(dicc)):
-                    auxx=dicc[i]
-                    dicc[i]=ff
-                    ff=auxx
-                break
-         self.dicrW[dificD[self.dificultad]]=dicc              
+         ari=self.dicrW[dificD[self.dificultad]]
+         ari.append(time)
+         ari.sort(reverse=False)
+         print(ari)
+         self.dicrW[dificD[self.dificultad]]=ari
+        else:
+         pass
 
-    def nwindowB(self, binlcuir=False, time=0):
-        self.grab_set()
-        global dicrWin
-        dificD=["muy facil","facil","medio","dificil","extreme"]
-        if binlcuir:
-            self.updateDictW(time=time)
-        dicc=self.dicrW[dificD[self.dificultad]]
-        nwin = Toplevel()
-        nwin.geometry('500x450')
-        nwin.resizable(False, False)
-        tile="Tabla de ganadores"
-        ruta="Resources/leader.png"
-        nwin.title(tile)
-        imgt=Image.open(ruta)
-        imgt = imgt.resize((400, 140), Image.ANTIALIAS)
-        photo2= ImageTk.PhotoImage(imgt)
-        lbl2 = Label(nwin, image = photo2)
-        lbl2.pack()
-        lbl = Label(nwin, text="Dificultad "+ str(dificD[self.dificultad]).capitalize(), font="Courier 20")
-        lbl.pack()
-         
-        for key, value in dicc.items():
-           
-            if value is not 0:
-                minutes, seconds = divmod(value, 60)
-                seconds = str(int(seconds)).zfill(2)
-                vav=str(key) + " Tiempo:   "+"{:0>2}:{}".format(int(minutes),seconds) 
-                
-            else:
-                vav=str(key) + "-----------------"
-            lbl = Label(nwin, text=vav, font="Courier 14")
-            lbl.pack()
-    #    aa = Label(nwin,text =texto,width=1000, font = "Courier 20")
-    #    aa.pack()
-    #    ab = Label(nwin,text =tt,width=1000, font = "Courier 14")
-    #    ab.pack()
-    #    b= Button(nwin,text="OK",command= lambda: (nwin.destroy(), self.grab_release(), self.reset()), bd=3, relief=RIDGE, bg='#6DB6FF')
-    #    b.pack() 
-        nwin.mainloop()
-
+    
   #------------------------------------------------------      
-  #Metodos inicio
+  #StartMethods
   #------------------------------------------------------
     
     def menuCreate(self):
@@ -191,9 +97,10 @@ class App(Tk):
   #------------------------------------------------------
       
     def frameCreate(self, dificultad=1):
-        self.menuCreate()   
-        global timer    
-        timer = time.time()
+        self.menuCreate()    
+        self.inicio=time.time()
+        self.tiempo=0
+        self.crono=True
         self.bomb_area = Frame(self)
         self.cells = []
         self.cells_discovered = 0
@@ -209,7 +116,6 @@ class App(Tk):
                 cell = self.make_cell(column, row)
                 cell.grid(row=row, column=column, sticky='NEWS')
                 self.cells[-1].append(cell)
-        print(str(cont) + "---")
 
     # configure squares adjacent to mines with adjacent mine count
         for r in range(self.grid_dimentions):
@@ -238,12 +144,12 @@ class App(Tk):
 
 
   #------------------------------------------------------      
-  #Metodos dficiultad
+  # Difficulty
   #------------------------------------------------------
 
     def veasy(self):
         self.dificultad=0
-        self.numBoombs=1
+        self.numBoombs=2
         self.plantedBoombs = getRandomSeed(1)
         self.reset()
     def easy(self):
@@ -268,7 +174,7 @@ class App(Tk):
         self.reset()
 
   #------------------------------------------------------
-  # Metodos internos
+  # LogicMethods
   #------------------------------------------------------
 
     def locate_cell(self, cell):
@@ -352,7 +258,8 @@ class App(Tk):
                 cell.image=ImageTk.PhotoImage(imgt)
                 cell.color = 'white'
                 cell.hide_text()
-                self.mines_flagged -= 1
+                if cell.is_explosive:
+                    self.mines_flagged -= 1
         self.check_victory()
 
   #------------------------------------------------------
@@ -371,7 +278,7 @@ class App(Tk):
         return c
         
   #------------------------------------------------------
-  # Metodos fin
+  # EndMethodss
   #------------------------------------------------------
     def reset(self, d=1):
         for widget in self.bomb_area.winfo_children():
@@ -379,34 +286,105 @@ class App(Tk):
         self.bomb_area.pack_forget()
         self.plantedBoombs =getRandomSeed(self.numBoombs)
         self.frameCreate(dificultad=d)
-
-    def exitGame(self):
-        resul = messagebox.askquestion('Por favor juega conmigo','¿Estas seguro?')
-        if resul == "yes":
-            self.quit()
-            self.destroy()
-        elif resul == "no":            
-            self.reset()
           
     def check_victory(self):
         print (self.mines_flagged, self.cells_discovered)
         if self.mines_flagged + self.cells_discovered == self.grid_dimentions**2:
+            self.crono=False
             self.nwindow(True)
             
-
+  #------------------------------------------------------      
+  # WinLoose
+  #------------------------------------------------------
+    def nwindow(self, bwin=False):
+        self.grab_set()
+        nwin = Toplevel()
+        nwin.geometry('250x200')
+        nwin.protocol("WM_DELETE_WINDOW", lambda: (nwin.destroy(), self.grab_release(), self.reset()))
+        nwin.resizable(False, False)
+        end= self.tiempo
+        timer=self.inicio
+        varT= end-timer
+        if varT < 0:
+            varT=0
+        minutes, seconds = divmod(varT, 60)
+        seconds = str(int(seconds)).zfill(2)
+        tt = "Tiempo: "+"{:0>2}:{}".format(int(minutes),seconds)
+        tile="Oh vaya!!!!"
+        ruta="Resources/decepcion.png"
+        texto="¡Has perdido!"
+        if bwin:
+            tile="Enhorabuena!!!!"
+            ruta="Resources/firecracker.png"
+            texto="¡Has ganado!"
+        nwin.title(tile)
+        imgt=Image.open(ruta)
+        imgt = imgt.resize((100, 100), Image.ANTIALIAS)
+        photo2= ImageTk.PhotoImage(imgt)
+        lbl2 = Label(nwin, image = photo2)
+        lbl2.pack()
+        aa = Label(nwin,text =texto,width=1000, font = "Courier 20")
+        aa.pack()
+        ab = Label(nwin,text =tt,width=1000, font = "Courier 14")
+        ab.pack()
+        b= Button(nwin,text="OK",command= lambda : (nwin.destroy(), self.grab_release(), self.reset(), self.updateDictW(bmos=bwin, time=end-timer) ), bd=3, relief=RIDGE, bg='#6DB6FF')
+        b.pack() 
+        nwin.mainloop()  
+        
+  #------------------------------------------------------      
+  # ScoreBoard
+  #------------------------------------------------------
+    def nwindowB(self, binlcuir=False, time=0):
+        self.grab_set()
+        global dicrWin
+        dificD=["muy facil","facil","medio","dificil","extreme"]
+        #if binlcuir:
+        #    self.updateDictW(time=time)
+        ari=self.dicrW[dificD[self.dificultad]]
+        print("Estoy en nwindowB")
+        print(ari)
+        nwin = Toplevel()
+        nwin.geometry('500x450')
+        nwin.resizable(False, False)
+        tile="Tabla de ganadores"
+        ruta="Resources/leader.png"
+        nwin.title(tile)
+        imgt=Image.open(ruta)
+        imgt = imgt.resize((400, 140), Image.ANTIALIAS)
+        photo2= ImageTk.PhotoImage(imgt)
+        lbl2 = Label(nwin, image = photo2)
+        lbl2.pack()
+        lbl = Label(nwin, text="Dificultad "+ str(dificD[self.dificultad]).capitalize(), font="Courier 20")
+        lbl.pack()
+        for i in range(1, len(ari)+1):
+             value=ari[i-1]
+             minutes, seconds = divmod(value, 60)
+             seconds = str(int(seconds)).zfill(2)
+             vav=str(i) + " Tiempo:   "+"{:0>2}:{}".format(int(minutes),seconds)
+             lbl = Label(nwin, text=vav, font="Courier 14")
+             lbl.pack()
+        if 10-len(ari)>=0:
+            for i in range(len(ari),10-len(ari)):
+                vav=str(i) + "-----------------"
+                lbl = Label(nwin, text=vav, font="Courier 14")
+                lbl.pack()
+        nwin.mainloop()
+  
 
   #------------------------------------------------------
-  #Timer
+  # Timer
   #------------------------------------------------------
     
     def Refresher(self):
-        global text
-        global timer
-        end = time.time()
-        minutes, seconds = divmod(end-timer, 60)
-        seconds = str(int(seconds)).zfill(2)
-        tt = "Tiempo: "+"{:0>2}:{}".format(int(minutes),seconds)
-        text.configure(text=tt)
+        if self.crono:
+            global text
+            timer=self.inicio
+            end = time.time()
+            self.tiempo= end
+            minutes, seconds = divmod(end-timer, 60)
+            seconds = str(int(seconds)).zfill(2)
+            tt = "Tiempo: "+"{:0>2}:{}".format(int(minutes),seconds)
+            text.configure(text=tt)
         self.after(1000, self.Refresher) # every second...
 
     def Draw(self):
@@ -418,14 +396,4 @@ class App(Tk):
 
    #------------------------------------------------------
 
-     
-class NewWindow(Toplevel): 
-      
-    def __init__(self, master = None): 
-          
-        super().__init__(master = master) 
-        self.title("New Window") 
-        self.geometry("200x200") 
-        label = Label(self, text ="This is a new Window") 
-        label.pack() 
-  
+    
