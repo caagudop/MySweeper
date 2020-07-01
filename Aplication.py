@@ -56,9 +56,6 @@ class App(Tk):
         self.dificL=Label(self,text='', bg=bcolor, fg=tcolor)
         self.dificL.pack(side=TOP, fill=X) 
         self.frameCreate()
-         #imgt=Image.open("Resources/minesweeperflag.png")
-         #   imgt = imgt.resize((40, 40), Image.ANTIALIAS)
-         #   cell.image = ImageTk.PhotoImage(imgt)
         self.footer = Button(self, text="Reset",command=self.reset, bd=3, relief=RIDGE, bg='#6DB6FF')
         self.footer.pack(after=self.bomb_area, side=BOTTOM) 
   
@@ -69,7 +66,6 @@ class App(Tk):
          ari=self.dicrW[dificD[self.dificultad]]
          ari.append(time)
          ari.sort(reverse=False)
-         print(ari)
          self.dicrW[dificD[self.dificultad]]=ari
         else:
          pass
@@ -141,7 +137,6 @@ class App(Tk):
                     yield self.cells[i][j]
                 except IndexError:
                     pass
-
 
   #------------------------------------------------------      
   # Difficulty
@@ -288,7 +283,6 @@ class App(Tk):
         self.frameCreate(dificultad=d)
           
     def check_victory(self):
-        print (self.mines_flagged, self.cells_discovered)
         if self.mines_flagged + self.cells_discovered == self.grid_dimentions**2:
             self.crono=False
             self.nwindow(True)
@@ -299,6 +293,7 @@ class App(Tk):
     def nwindow(self, bwin=False):
         self.grab_set()
         nwin = Toplevel()
+        nwin.grab_set()
         nwin.geometry('250x200')
         nwin.protocol("WM_DELETE_WINDOW", lambda: (nwin.destroy(), self.grab_release(), self.reset()))
         nwin.resizable(False, False)
@@ -327,7 +322,7 @@ class App(Tk):
         aa.pack()
         ab = Label(nwin,text =tt,width=1000, font = "Courier 14")
         ab.pack()
-        b= Button(nwin,text="OK",command= lambda : (nwin.destroy(), self.grab_release(), self.reset(), self.updateDictW(bmos=bwin, time=end-timer) ), bd=3, relief=RIDGE, bg='#6DB6FF')
+        b= Button(nwin,text="OK",command= lambda : (nwin.destroy(), nwin.grab_release(), self.reset(), self.updateDictW(bmos=bwin, time=end-timer) ), bd=3, relief=RIDGE, bg='#6DB6FF')
         b.pack() 
         nwin.mainloop()  
         
@@ -335,15 +330,13 @@ class App(Tk):
   # ScoreBoard
   #------------------------------------------------------
     def nwindowB(self, binlcuir=False, time=0):
-        self.grab_set()
         global dicrWin
         dificD=["muy facil","facil","medio","dificil","extreme"]
         #if binlcuir:
         #    self.updateDictW(time=time)
         ari=self.dicrW[dificD[self.dificultad]]
-        print("Estoy en nwindowB")
-        print(ari)
         nwin = Toplevel()
+        nwin.grab_set()
         nwin.geometry('500x450')
         nwin.resizable(False, False)
         tile="Tabla de ganadores"
@@ -354,20 +347,19 @@ class App(Tk):
         photo2= ImageTk.PhotoImage(imgt)
         lbl2 = Label(nwin, image = photo2)
         lbl2.pack()
-        lbl = Label(nwin, text="Dificultad "+ str(dificD[self.dificultad]).capitalize(), font="Courier 20")
+        lbl = Label(nwin, text="Dificultad: "+ str(dificD[self.dificultad]).capitalize(), font="Courier 20")
         lbl.pack()
-        for i in range(1, len(ari)+1):
-             value=ari[i-1]
-             minutes, seconds = divmod(value, 60)
-             seconds = str(int(seconds)).zfill(2)
-             vav=str(i) + " Tiempo:   "+"{:0>2}:{}".format(int(minutes),seconds)
-             lbl = Label(nwin, text=vav, font="Courier 14")
-             lbl.pack()
-        if 10-len(ari)>=0:
-            for i in range(len(ari),10-len(ari)):
-                vav=str(i) + "-----------------"
-                lbl = Label(nwin, text=vav, font="Courier 14")
-                lbl.pack()
+        if len(ari)>0:
+            for i in range(1, len(ari)+1):
+                 value=ari[i-1]
+                 minutes, seconds = divmod(value, 60)
+                 seconds = str(int(seconds)).zfill(2)
+                 vav=str(i) + ". Tiempo:  "+"{:0>2}:{}".format(int(minutes),seconds)
+                 lbl = Label(nwin, text=vav, font="Courier 14")
+                 lbl.pack()
+        else:
+            lbl = Label(nwin, text="Not Records yet", font="Courier 18", fg="red")
+            lbl.pack()
         nwin.mainloop()
   
 
